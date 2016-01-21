@@ -1,0 +1,4 @@
+*.o
+assets/bulk/*
+bin/*
+*.sh
