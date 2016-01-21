@@ -1,0 +1,8 @@
+{
+  "Cursor" : {
+    "Default" : "assets/cursor/default.json"
+  },
+  "Tiles" : {
+    "Floor" : "assets/tiles/floor01.json"
+  }
+}

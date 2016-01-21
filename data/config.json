@@ -1,0 +1,16 @@
+{
+  "Game" : {
+    "Version" : "v0.not.even.a.number.1"
+  },
+  "Display" : {
+    "Name" : "BigRip",
+    "Width" : 1920,
+    "Height" : 1080,
+    "Fullscreen" : false,
+    "Borderless" : false,
+    "VSync" : true
+  },
+  "Assets" : {
+    "List" : "assets/assets.json"
+  }
+}

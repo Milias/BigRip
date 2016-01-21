@@ -1,0 +1,9 @@
+{
+  "Name" : "Test001",
+  "Assets" : [ "Floor01" ],
+  "Layers" : {
+    "Player" : {
+      "Floor01" : [ [0, 0], [32, 0], [64, 0] ]
+    }
+  }
+}
