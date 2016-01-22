@@ -13,7 +13,6 @@ int AssetsManager::Initialize(SDL_Renderer * r)
   file.close();
 
   ren = r;
-
   return 0;
 }
 
@@ -32,7 +31,7 @@ void AssetsManager::__Load(AssetData *a)
   }
 }
 
-int AssetsManager::PreLoadAssets()
+void AssetsManager::PreLoadAssets()
 {
   for (Json::ValueIterator it1 = aLib->begin(); it1 != aLib->end(); it1++) {
     for (Json::ValueIterator it2 = it1->begin(); it2 != it1->end(); it2++) {
@@ -53,7 +52,6 @@ int AssetsManager::PreLoadAssets()
 
   SDL_SetCursor(SDL_CreateColorCursor(assets->at("DefaultCursor")->surf,0,0));
   std::cout << "Loaded " << nAssets << " assets.\n";
-  return 0;
 }
 
 AssetData * AssetsManager::LoadAsset(std::string name)
@@ -65,4 +63,13 @@ AssetData * AssetsManager::LoadAsset(std::string name)
     LogError(std::cout, e.what());
   }
   return NULL;
+}
+
+void AssetsManager::UnloadAssets()
+{
+  for (AssetsMap::iterator it = assets->begin(); it != assets->end(); it++) {
+    if ((*it->second->json)["Unload"].asBool() && it->second->IsLoaded) {
+      it->second->Unload();
+    }
+  }
 }

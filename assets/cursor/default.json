@@ -4,5 +4,6 @@
   "Size" : [0, 0, 20, 24],
   "Surface" : true,
   "Texture" : false,
-  "LoadOnStartup" : true
+  "LoadOnStartup" : true,
+  "Unload" : false
 }

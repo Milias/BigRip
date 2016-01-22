@@ -1,9 +1,9 @@
 {
   "Game" : {
+    "Name" : "BigRip",
     "Version" : "v0.not.even.a.number.1"
   },
   "Display" : {
-    "Name" : "BigRip",
     "Width" : 1920,
     "Height" : 1080,
     "Fullscreen" : false,
@@ -12,5 +12,8 @@
   },
   "Assets" : {
     "List" : "assets/assets.json"
+  },
+  "Levels" : {
+    "List" : "levels/levels.json"
   }
 }

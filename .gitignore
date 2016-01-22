@@ -2,3 +2,4 @@
 assets/bulk/*
 bin/*
 *.sh
+script.lua

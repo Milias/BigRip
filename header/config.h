@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <functional>
+#include <chrono>
 
 // Boost
 #include <boost/uuid/uuid.hpp>
@@ -21,6 +22,7 @@ extern "C" {
 
 #include "SDL.h"
 #include "SDL_image.h"
+#include "SDL_ttf.h"
 
 void LogError(std::ostream &os, char const * msg);
 void LogSDLError(std::ostream &os, char const * msg);

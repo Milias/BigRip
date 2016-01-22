@@ -5,6 +5,7 @@
   "Surface" : false,
   "Texture" : true,
   "LoadOnStartup" : false,
+  "Unload" : true,
   "Properties" : {
     "AllowInside" : false,
     "AllowFall" : false,

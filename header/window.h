@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include "config.h"
 
 class WindowManager
@@ -11,9 +10,7 @@ private:
 
 public:
   WindowManager();
-  ~WindowManager() {
-    SDL_DestroyWindow(win);
-  }
+  ~WindowManager() { SDL_DestroyWindow(win); }
 
   int Initialize();
 };

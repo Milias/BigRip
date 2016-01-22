@@ -11,7 +11,7 @@ int WindowManager::Initialize()
   flags |= ((*cfg)["Display"]["Fullscreen"].asBool() ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | ((*cfg)["Display"]["Borderless"].asBool() ? SDL_WINDOW_BORDERLESS : 0);
 
   char str[80];
-  strcat(str, (*cfg)["Display"]["Name"].asCString());
+  strcat(str, (*cfg)["Game"]["Name"].asCString());
   strcat(str, " ");
   strcat(str, (*cfg)["Game"]["Version"].asCString());
 

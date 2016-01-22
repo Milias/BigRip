@@ -3,6 +3,9 @@
     "Default" : "assets/cursor/default.json"
   },
   "Tiles" : {
-    "Floor" : "assets/tiles/floor01.json"
+    "Floor01" : "assets/tiles/floor01.json"
+  },
+  "Fonts" : {
+    "SpaceFont" : "assets/fonts/space.json"
   }
 }

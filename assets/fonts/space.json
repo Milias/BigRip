@@ -1,0 +1,8 @@
+{
+  "Name" : "SpaceFont",
+  "File" : "assets/fonts/space.ttf",
+  "Surface" : false,
+  "Texture" : false,
+  "LoadOnStartup" : false,
+  "Unload" : false
+}

@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include "config.h"
 
 struct AssetData
@@ -9,11 +8,10 @@ struct AssetData
   SDL_Surface * surf;
   bool IsLoaded;
 
-  AssetData() : json(NULL), tex(NULL), IsLoaded(false) {}
+  AssetData() : json(NULL), tex(NULL), surf(NULL), IsLoaded(false) {}
   ~AssetData() {
     delete json;
-    if (tex!=NULL) SDL_DestroyTexture(tex);
-    if (surf!=NULL) SDL_FreeSurface(surf);
+    Unload();
   }
 
   void Initialize(char const * f) {
@@ -21,6 +19,11 @@ struct AssetData
     std::ifstream file(f, std::ifstream::in);
     file >> *json;
     file.close();
+  }
+
+  void Unload() {
+    if (tex != NULL) SDL_DestroyTexture(tex);
+    if (surf != NULL) SDL_FreeSurface(surf);
   }
 };
 
@@ -43,11 +46,14 @@ private:
 public:
   AssetsManager();
   ~AssetsManager() {
+    for (AssetsMap::iterator it = assets->begin(); it != assets->end(); it++) { delete it->second; }
     delete assets;
     delete aLib;
   }
 
   int Initialize(SDL_Renderer * r);
-  int PreLoadAssets();
+  void PreLoadAssets();
   AssetData * LoadAsset(std::string name);
+
+  void UnloadAssets();
 };
