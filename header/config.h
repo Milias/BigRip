@@ -1,5 +1,6 @@
 #pragma once
 // STL
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <unordered_map>
@@ -20,6 +21,7 @@ extern "C" {
   #include "lualib.h"
 }
 
+// SDL
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_ttf.h"
@@ -86,10 +88,10 @@ private:
 
   void __Process();
   boost::uuids::uuid __Register(SDL_EventType e, std::function<void(SDL_Event&)> f);
-  void __Unregister(boost::uuids::uuid uuid);
+  void __Unregister(boost::uuids::uuid &uuid);
 
 public:
   static void Process();
   static boost::uuids::uuid Register(SDL_EventType e, std::function<void(SDL_Event&)> f);
-  static void Unregister(boost::uuids::uuid uuid);
+  static void Unregister(boost::uuids::uuid &uuid);
 };

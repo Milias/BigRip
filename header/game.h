@@ -1,12 +1,11 @@
 #pragma once
-#include <iostream>
-#include <cstring>
 #include "config.h"
 #include "window.h"
 #include "render.h"
 #include "assets.h"
 #include "levels.h"
 #include "interface.h"
+#include "movement.h"
 
 typedef std::chrono::high_resolution_clock DefaultClock;
 
@@ -18,6 +17,7 @@ private:
   RenderManager *render;
   AssetsManager *assets;
   LevelsManager *levels;
+  MovementManager *movement;
 
   bool StopMainLoop;
   int32_t CenterX, CenterY;

@@ -33,7 +33,7 @@ boost::uuids::uuid SingletonEvents::__Register(SDL_EventType e, std::function<vo
   return r.uuid;
 }
 
-void SingletonEvents::__Unregister(boost::uuids::uuid uuid)
+void SingletonEvents::__Unregister(boost::uuids::uuid &uuid)
 {
   for (auto it : *map) {
     if (it.second.uuid == uuid) {
@@ -55,7 +55,7 @@ boost::uuids::uuid SingletonEvents::Register(SDL_EventType e, std::function<void
   return Instance->__Register(e, f);
 }
 
-void SingletonEvents::Unregister(boost::uuids::uuid uuid)
+void SingletonEvents::Unregister(boost::uuids::uuid &uuid)
 {
   if (Instance == NULL) { Instance = new SingletonEvents; }
   Instance->__Unregister(uuid);

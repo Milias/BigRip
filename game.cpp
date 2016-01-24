@@ -16,6 +16,7 @@ void GameManager::__RenderCurrentLevel()
 {
   for (std::vector<ObjectData*>::iterator it = CurrentLevel.begin(); it != CurrentLevel.end(); it++) {
     (*it)->Shift(CenterX, CenterY);
+    (*it)->Rendered = ((*it)->local.x) < render->Width && ((*it)->local.y) < render->Height && ((*it)->local.x + (*it)->local.w) > 0 && ((*it)->local.y + (*it)->local.h) > 0;
     (*it)->Render(render->ren);
   }
 }
@@ -59,6 +60,12 @@ int GameManager::Initialize()
   levels = new LevelsManager;
   if (levels->Initialize()) {
     LogError(std::cout, "Error initializing LevelsManager.\n");
+    return 1;
+  }
+
+  movement = new MovementManager;
+  if (movement->Initialize()) {
+    LogError(std::cout, "Error initializing MovementManager.\n");
     return 1;
   }
 
@@ -123,10 +130,10 @@ void GameManager::MainLoop()
     elapsed += dt;
     SingletonEvents::Process();
     SDL_RenderClear(render->ren);
-    CenterX = -960 + 200*cos(elapsed);
-    CenterY = -540 - 200*sin(elapsed);
+    CenterX = movement->CenterX;
+    CenterY = movement->CenterY;
     __RenderCurrentLevel();
   	SDL_RenderPresent(render->ren);
-    printf("FPS: %2.3f\n",1.0/dt);
+    //printf("FPS: %2.3f\n",1.0/dt);
   }
 }

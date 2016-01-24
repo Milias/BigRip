@@ -1,5 +1,5 @@
 CXXFLAGS += -std=c++14 -pedantic -Wall -g -Iheader -I../LuaBridge/Source/LuaBridge -Ijson  `sdl2-config --cflags`
-LDFLAGS += -lSDL2_image -llua `sdl2-config --libs`
+LDFLAGS += -lSDL2_image -lSDL2_ttf -llua `sdl2-config --libs`
 TARGET = bin/bigrip
 
 CPP = $(wildcard *.cpp)

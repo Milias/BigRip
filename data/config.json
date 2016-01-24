@@ -15,5 +15,11 @@
   },
   "Levels" : {
     "List" : "levels/levels.json"
+  },
+  "Keys" : {
+    "Left" : "D",
+    "Right" : "A",
+    "Jump" : "Space",
+    "Activate" : "E"
   }
 }
