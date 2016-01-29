@@ -1,6 +1,7 @@
 {
   "Name" : "Test001",
   "Assets" : [ "Floor01" ],
+  "Spawn" : [ 32, -32 ],
   "Tiles" : {
     "Floor01" : [ [0, 0], [64, 0], [128, 0] ]
   }

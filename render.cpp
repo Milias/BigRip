@@ -11,7 +11,7 @@ int RenderManager::Initialize(SDL_Window *win)
   flags |= ((*cfg)["Display"]["VSync"].asBool() ? SDL_RENDERER_PRESENTVSYNC : 0);
 
   ren = SDL_CreateRenderer(win, -1, flags);
-  if (ren == NULL){
+  if (ren == NULL) {
     LogSDLError(std::cout, "SDL_CreateRenderer");
   	SDL_Quit();
   	return 1;

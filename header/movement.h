@@ -15,11 +15,22 @@ private:
   Json::Value * cfg;
   MoveEventMap * map;
 
-  int32_t CenterX, CenterY;
+  b2World * world;
+
+  double PixelToMeters;
+  double CenterX, CenterY;
+  double speedLimitX, speedLimitY;
+
+  uint32_t vIter, pIter;
+
+  b2Body * CenterBody;
 
 public:
   MovementManager();
   ~MovementManager() {}
 
   int Initialize();
+  void CreateWorld();
+  void SetCenter(int32_t x, int32_t y);
+  void UpdateDynamicPositions(double dt);
 };

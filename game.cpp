@@ -86,7 +86,7 @@ int GameManager::RenderAsset(char const * name, uint32_t x, uint32_t y)
   if (asset == NULL) return 1;
   dst.w = (*asset->json)["Size"][2].asInt();
   dst.h = (*asset->json)["Size"][3].asInt();
-	SDL_RenderCopy(render->ren, asset->tex, NULL, &dst);
+	SDL_RenderCopy(render->ren, asset->tex == NULL ? SDL_CreateTextureFromSurface(render->ren,asset->surf) : asset->tex, NULL, &dst);
   return 0;
 }
 
@@ -115,6 +115,10 @@ int GameManager::LoadLevel(char const * name)
       }
     }
   }
+
+  movement->SetCenter((*level->json)["Spawn"][0].asInt() - render->Width / 2, (*level->json)["Spawn"][1].asInt() - render->Height / 2);
+  movement->CreateWorld();
+
   return 0;
 }
 
@@ -130,9 +134,12 @@ void GameManager::MainLoop()
     elapsed += dt;
     SingletonEvents::Process();
     SDL_RenderClear(render->ren);
-    CenterX = movement->CenterX;
-    CenterY = movement->CenterY;
+    movement->UpdateDynamicPositions(dt);
+    CenterX = movement->CenterX / movement->PixelToMeters;
+    CenterY = movement->CenterY / movement->PixelToMeters;
+    //printf("x: %4d, y: %4d\n", CenterX, CenterY);
     __RenderCurrentLevel();
+    RenderAsset("DefaultCursor", 960, 540);
   	SDL_RenderPresent(render->ren);
     //printf("FPS: %2.3f\n",1.0/dt);
   }

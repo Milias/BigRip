@@ -14,6 +14,7 @@
 // ThirdPary
 #include "json.h"
 #include "LuaBridge.h"
+#include <Box2D/Box2D.h>
 
 extern "C" {
   #include "lua.h"
