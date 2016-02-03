@@ -76,7 +76,7 @@ struct TimedEvent {
       for (;acc >= period; acc -= period) {
         for (auto it : response) it(period, elapsed);
       }
-    } else { for (auto it : response) it(period, elapsed); }
+    } else { for (auto it : response) it(dt, elapsed); }
   }
 };
 
@@ -140,6 +140,9 @@ private:
   void __RemoveFromTimer(boost::uuids::uuid &uuid, uint32_t N);
   void __UnregisterTimer(boost::uuids::uuid &uuid);
 
+  void __Toggle(boost::uuids::uuid &uuid, bool s);
+  void __ToggleTimer(boost::uuids::uuid &uuid, bool s);
+
 public:
   static void Process();
   static void ProcessTimers();
@@ -151,6 +154,9 @@ public:
   static void AddToTimer(boost::uuids::uuid &uuid, std::function<void(double,double)> f);
   static void RemoveFromTimer(boost::uuids::uuid &uuid, uint32_t N = 1);
   static void UnregisterTimer(boost::uuids::uuid &uuid);
+
+  static void Toggle(boost::uuids::uuid &uuid, bool s);
+  static void ToggleTimer(boost::uuids::uuid &uuid, bool s);
 
   static void StartTimer();
 };

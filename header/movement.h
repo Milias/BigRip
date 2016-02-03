@@ -10,12 +10,14 @@ struct MoveEvent
   bool is_down;
   boost::uuids::uuid key_up;
   boost::uuids::uuid key_down;
+  boost::uuids::uuid timer;
 
-  MoveEvent() : is_down(false), key_up(boost::uuids::nil_uuid()), key_down(boost::uuids::nil_uuid()) {}
+  MoveEvent() : is_down(false), key_up(boost::uuids::nil_uuid()), key_down(boost::uuids::nil_uuid()), timer(boost::uuids::nil_uuid()) {}
 
   ~MoveEvent() {
     SingletonEvents::Unregister(key_up);
     SingletonEvents::Unregister(key_down);
+    SingletonEvents::UnregisterTimer(timer);
   }
 };
 

@@ -78,7 +78,7 @@ int GameManager::Initialize()
     this->CenterY -= this->render->Height / 2;
   }, _1, _2));
 
-  SingletonEvents::RegisterTimer(1/60.0, std::bind<void>([this](double dt, double elapsed)
+  SingletonEvents::RegisterTimer(-1.0, std::bind<void>([this](double dt, double elapsed)
   {
     SDL_RenderClear(this->render->ren);
     this->__RenderCurrentLevel();

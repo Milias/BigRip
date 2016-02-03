@@ -15,15 +15,23 @@ int MovementManager::Initialize()
 
   ev = new MoveEvent;
   key = SDL_GetKeyFromName((*cfg)["Keys"]["Left"].asCString());
+
+  ev->timer = SingletonEvents::RegisterTimer(PhysicsDeltaTime, std::bind<void>([this](double dt, double elapsed) {
+    this->ControlBody->ApplyLinearImpulse(b2Vec2(1.0,0.0), this->ControlBody->GetWorldCenter(), true);
+  }, _1, _2));
+
+  SingletonEvents::ToggleTimer(ev->timer, false);
+
   ev->key_down = SingletonEvents::Register(SDL_KEYDOWN, std::bind<void>([this, key, ev](SDL_Event &e) {
     if (key == e.key.keysym.sym && ControlBody != NULL && !ev->is_down) {
-      this->ControlBody->ApplyLinearImpulse(b2Vec2(3.0,0.0), this->ControlBody->GetWorldCenter(), true);
+      SingletonEvents::ToggleTimer(ev->timer, true);
       ev->is_down = true;
     }
   }, _1));
 
   ev->key_up = SingletonEvents::Register(SDL_KEYUP, std::bind<void>([this, key, ev](SDL_Event &e) {
     if (key == e.key.keysym.sym && ControlBody != NULL) {
+      SingletonEvents::ToggleTimer(ev->timer, false);
       ev->is_down = false;
     }
   }, _1));
@@ -32,15 +40,23 @@ int MovementManager::Initialize()
 
   ev = new MoveEvent;
   key = SDL_GetKeyFromName((*cfg)["Keys"]["Right"].asCString());
+
+  ev->timer = SingletonEvents::RegisterTimer(PhysicsDeltaTime, std::bind<void>([this](double dt, double elapsed) {
+    this->ControlBody->ApplyLinearImpulse(b2Vec2(-1.0,0.0), this->ControlBody->GetWorldCenter(), true);
+  }, _1, _2));
+
+  SingletonEvents::ToggleTimer(ev->timer, false);
+
   ev->key_down = SingletonEvents::Register(SDL_KEYDOWN, std::bind<void>([this, key, ev](SDL_Event &e) {
     if (key == e.key.keysym.sym && ControlBody != NULL && !ev->is_down) {
-      this->ControlBody->ApplyLinearImpulse(b2Vec2(-3.0,0.0), this->ControlBody->GetWorldCenter(), true);
+      SingletonEvents::ToggleTimer(ev->timer, true);
       ev->is_down = true;
     }
   }, _1));
 
   ev->key_up = SingletonEvents::Register(SDL_KEYUP, std::bind<void>([this, key, ev](SDL_Event &e) {
     if (key == e.key.keysym.sym && ControlBody != NULL) {
+      SingletonEvents::ToggleTimer(ev->timer, false);
       ev->is_down = false;
     }
   }, _1));

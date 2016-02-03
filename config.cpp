@@ -30,7 +30,10 @@ void SingletonEvents::__ProcessTimers()
   dt = std::chrono::duration<double>(GlobalClock.now() - t0).count();
   t0 = GlobalClock.now();
   elapsed += dt;
-  for (auto it : *timers) it.second->update(dt,elapsed);
+  for (auto it : *timers) {
+    if (!it.second->active) continue;
+    it.second->update(dt,elapsed);
+  }
 }
 
 boost::uuids::uuid SingletonEvents::__Register(SDL_EventType e, std::function<void(SDL_Event&)> f)
@@ -68,7 +71,7 @@ void SingletonEvents::__AddToTimer(boost::uuids::uuid &uuid, std::function<void(
   try {
     timers->at(uuid)->response.push_back(f);
   } catch (std::out_of_range &e) {
-    LogError(std::cout, "Error appending to timer.");
+    LogError(std::cout, "Error appending to timer: not found.");
   }
 }
 
@@ -80,7 +83,7 @@ void SingletonEvents::__RemoveFromTimer(boost::uuids::uuid &uuid, uint32_t N)
     N = (N > it->response.size() ? it->response.size() : N);
     for (uint32_t i = 0; i < N; i++) it->response.pop_back();
   } catch (std::out_of_range &e) {
-    LogError(std::cout, "Error removing from timer.");
+    LogError(std::cout, "Error removing from timer: not found.");
   }
 }
 
@@ -88,6 +91,27 @@ void SingletonEvents::__UnregisterTimer(boost::uuids::uuid &uuid)
 {
   if (uuid.is_nil()) return;
   timers->erase(uuid);
+}
+
+void SingletonEvents::__Toggle(boost::uuids::uuid &uuid, bool s)
+{
+  if (uuid.is_nil()) return;
+  for (auto it : *events) {
+    if (it.second->uuid == uuid) {
+      it.second->active = s;
+      break;
+    }
+  }
+}
+
+void SingletonEvents::__ToggleTimer(boost::uuids::uuid &uuid, bool s)
+{
+  if (uuid.is_nil()) return;
+  try {
+    timers->at(uuid)->active = s;
+  } catch (std::out_of_range &e) {
+    LogError(std::cout, "Error toggling timer: not found.");
+  }
 }
 
 void SingletonEvents::Process()
@@ -136,6 +160,18 @@ void SingletonEvents::UnregisterTimer(boost::uuids::uuid &uuid)
 {
   if (Instance == NULL) { Instance = new SingletonEvents; }
   Instance->__UnregisterTimer(uuid);
+}
+
+void SingletonEvents::Toggle(boost::uuids::uuid &uuid, bool s)
+{
+  if (Instance == NULL) { Instance = new SingletonEvents; }
+  Instance->__Toggle(uuid, s);
+}
+
+void SingletonEvents::ToggleTimer(boost::uuids::uuid &uuid, bool s)
+{
+  if (Instance == NULL) { Instance = new SingletonEvents; }
+  Instance->__ToggleTimer(uuid, s);
 }
 
 void SingletonEvents::StartTimer()
