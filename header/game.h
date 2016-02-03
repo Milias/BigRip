@@ -7,8 +7,6 @@
 #include "interface.h"
 #include "movement.h"
 
-typedef std::chrono::high_resolution_clock DefaultClock;
-
 class GameManager
 {
 private:
@@ -28,7 +26,6 @@ private:
   void __RenderCurrentLevel();
 
 public:
-
   GameManager();
   ~GameManager() {
     __CleanCurrentLevel();
@@ -36,6 +33,7 @@ public:
     delete render;
     delete assets;
     delete levels;
+    delete movement;
     IMG_Quit();
     SDL_Quit();
   }

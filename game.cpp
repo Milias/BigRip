@@ -72,7 +72,24 @@ int GameManager::Initialize()
   assets->PreLoadAssets();
   levels->PreLoadLevels();
 
-  SingletonEvents::Register(SDL_QUIT, std::bind<void>([this](SDL_Event &e) { this->StopMainLoop = true; }, std::placeholders::_1));
+  SingletonEvents::AddToTimer(movement->UpdateTimer, std::bind<void>([this](double dt, double elapsed) {
+    this->movement->SetToCenterInPixels(this->CenterX, this->CenterY);
+    this->CenterX -= this->render->Width / 2;
+    this->CenterY -= this->render->Height / 2;
+  }, _1, _2));
+
+  SingletonEvents::RegisterTimer(1/60.0, std::bind<void>([this](double dt, double elapsed)
+  {
+    SDL_RenderClear(this->render->ren);
+    this->__RenderCurrentLevel();
+    this->RenderAsset("DefaultCursor", this->render->Width / 2, this->render->Height / 2);
+    SDL_RenderPresent(this->render->ren);
+  }, _1, _2));
+
+  SingletonEvents::Register(SDL_QUIT, std::bind<void>([this](SDL_Event &e)
+  {
+    this->StopMainLoop = true;
+  }, _1));
 
   return 0;
 }
@@ -105,42 +122,32 @@ int GameManager::LoadLevel(char const * name)
   CurrentLevel.clear();
   AssetData * asset;
   ObjectData * obj;
+
+  movement->CreateWorld((*level->json)["Gravity"][0].asDouble(),(*level->json)["Gravity"][1].asDouble());
+
   for (Json::ValueIterator it = (*level->json)["Assets"].begin(); it != (*level->json)["Assets"].end(); it++, asset = NULL) {
     asset = assets->LoadAsset(it->asCString());
     if (asset != NULL) {
       for (Json::ValueIterator it2 = (*level->json)["Tiles"][it->asCString()].begin(); it2 != (*level->json)["Tiles"][it->asCString()].end(); it2++) {
         obj = new ObjectData;
         obj->Initialize(asset->tex, (*it2)[0].asInt(), (*it2)[1].asInt(), (*asset->json)["Size"][2].asUInt(), (*asset->json)["Size"][3].asUInt());
+        movement->AddStaticBody(obj->world);
         CurrentLevel.push_back(obj);
       }
     }
   }
 
-  movement->SetCenter((*level->json)["Spawn"][0].asInt() - render->Width / 2, (*level->json)["Spawn"][1].asInt() - render->Height / 2);
-  movement->CreateWorld();
-
+  b2Body * b = movement->AddDynamicBody((*level->json)["Spawn"][0].asInt(), (*level->json)["Spawn"][1].asInt(), 64, 64);
+  movement->SetFollowBody(b);
+  movement->SetControlBody(b);
   return 0;
 }
 
 void GameManager::MainLoop()
 {
-  DefaultClock c;
-  std::chrono::time_point<DefaultClock> t0 = c.now();
-  double dt;
-  double elapsed = 0.0;
+  SingletonEvents::StartTimer();
   while(!StopMainLoop) {
-    dt = std::chrono::duration<double>(c.now() - t0).count();
-    t0 = c.now();
-    elapsed += dt;
     SingletonEvents::Process();
-    SDL_RenderClear(render->ren);
-    movement->UpdateDynamicPositions(dt);
-    CenterX = movement->CenterX / movement->PixelToMeters;
-    CenterY = movement->CenterY / movement->PixelToMeters;
-    //printf("x: %4d, y: %4d\n", CenterX, CenterY);
-    __RenderCurrentLevel();
-    RenderAsset("DefaultCursor", 960, 540);
-  	SDL_RenderPresent(render->ren);
-    //printf("FPS: %2.3f\n",1.0/dt);
+    SingletonEvents::ProcessTimers();
   }
 }

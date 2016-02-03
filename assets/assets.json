@@ -1,6 +1,6 @@
 {
   "Cursor" : {
-    "Default" : "assets/cursor/default.json"
+    "DefaultCursor" : "assets/cursor/default.json"
   },
   "Tiles" : {
     "Floor01" : "assets/tiles/floor01.json"

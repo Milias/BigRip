@@ -14,7 +14,7 @@
     "List" : "assets/assets.json"
   },
   "Levels" : {
-    "List" : "levels/levels.json"
+    "List" : "assets/levels/levels.json"
   },
   "Keys" : {
     "Left" : "D",

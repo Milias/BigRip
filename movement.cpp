@@ -1,110 +1,137 @@
 #include "movement.h"
 
-MovementManager::MovementManager() : PixelToMeters(0.03125), CenterX(0), CenterY(0), speedLimitX(10.0), speedLimitY(10.0), vIter(6), pIter(2)
+MovementManager::MovementManager() : map(NULL), world(NULL), CenterBody(NULL), ControlBody(NULL), PhysicsDeltaTime(0.00833333), PixelToMeters(0.03125), speedLimitX(10.0), speedLimitY(100.0), vIter(6), pIter(2)
 {
   cfg = SingletonConfig::config();
 }
 
-void MovementManager::SetCenter(int32_t x, int32_t y)
-{
-  CenterX = x * PixelToMeters;
-  CenterY = y * PixelToMeters;
-}
-
 int MovementManager::Initialize()
 {
+  if (map != NULL) { return 1; }
   map = new MoveEventMap;
 
   MoveEvent * ev;
-  std::string key;
+  SDL_Keycode key;
 
   ev = new MoveEvent;
-  key = (*cfg)["Keys"]["Left"].asString();
-  ev->uuid = SingletonEvents::Register(SDL_KEYDOWN, std::bind<void>([this, key](SDL_Event &e) {
-    static b2Vec2 f = b2Vec2(3.0,0.0);
-    if (strcmp(key.c_str(),SDL_GetKeyName(e.key.keysym.sym)) == 0 && CenterBody != NULL) {
-      this->CenterBody->ApplyLinearImpulse(f, this->CenterBody->GetWorldCenter(), true);
+  key = SDL_GetKeyFromName((*cfg)["Keys"]["Left"].asCString());
+  ev->key_down = SingletonEvents::Register(SDL_KEYDOWN, std::bind<void>([this, key, ev](SDL_Event &e) {
+    if (key == e.key.keysym.sym && ControlBody != NULL && !ev->is_down) {
+      this->ControlBody->ApplyLinearImpulse(b2Vec2(3.0,0.0), this->ControlBody->GetWorldCenter(), true);
+      ev->is_down = true;
     }
-  }, std::placeholders::_1));
+  }, _1));
+
+  ev->key_up = SingletonEvents::Register(SDL_KEYUP, std::bind<void>([this, key, ev](SDL_Event &e) {
+    if (key == e.key.keysym.sym && ControlBody != NULL) {
+      ev->is_down = false;
+    }
+  }, _1));
+
   map->emplace(key, ev);
 
   ev = new MoveEvent;
-  key = (*cfg)["Keys"]["Right"].asString();
-  ev->uuid = SingletonEvents::Register(SDL_KEYDOWN, std::bind<void>([this, key](SDL_Event &e) {
-    static b2Vec2 f = b2Vec2(-3.0,0.0);
-    if (strcmp(key.c_str(),SDL_GetKeyName(e.key.keysym.sym)) == 0 && CenterBody != NULL) {
-      this->CenterBody->ApplyLinearImpulse(f, this->CenterBody->GetWorldCenter(), true);
+  key = SDL_GetKeyFromName((*cfg)["Keys"]["Right"].asCString());
+  ev->key_down = SingletonEvents::Register(SDL_KEYDOWN, std::bind<void>([this, key, ev](SDL_Event &e) {
+    if (key == e.key.keysym.sym && ControlBody != NULL && !ev->is_down) {
+      this->ControlBody->ApplyLinearImpulse(b2Vec2(-3.0,0.0), this->ControlBody->GetWorldCenter(), true);
+      ev->is_down = true;
     }
-  }, std::placeholders::_1));
+  }, _1));
+
+  ev->key_up = SingletonEvents::Register(SDL_KEYUP, std::bind<void>([this, key, ev](SDL_Event &e) {
+    if (key == e.key.keysym.sym && ControlBody != NULL) {
+      ev->is_down = false;
+    }
+  }, _1));
+
   map->emplace(key, ev);
 
   ev = new MoveEvent;
-  key = (*cfg)["Keys"]["Jump"].asString();
-  ev->uuid = SingletonEvents::Register(SDL_KEYDOWN, std::bind<void>([this, key](SDL_Event &e) {
-    static b2Vec2 f = b2Vec2(0.0,-10.0);
-    if (strcmp(key.c_str(),SDL_GetKeyName(e.key.keysym.sym)) == 0 && CenterBody != NULL) {
-      this->CenterBody->ApplyLinearImpulse(f, this->CenterBody->GetWorldCenter(), true);
+  key = SDL_GetKeyFromName((*cfg)["Keys"]["Jump"].asCString());
+  ev->key_down = SingletonEvents::Register(SDL_KEYDOWN, std::bind<void>([this, key, ev](SDL_Event &e) {
+    if (key == e.key.keysym.sym && ControlBody != NULL && !ev->is_down) {
+      this->ControlBody->ApplyLinearImpulse(b2Vec2(0.0,-22.0), this->ControlBody->GetWorldCenter(), true);
+      ev->is_down = true;
     }
-  }, std::placeholders::_1));
+  }, _1));
+
+  ev->key_up = SingletonEvents::Register(SDL_KEYUP, std::bind<void>([this, key, ev](SDL_Event &e) {
+    if (key == e.key.keysym.sym && ControlBody != NULL) {
+      ev->is_down = false;
+    }
+  }, _1));
+
   map->emplace(key, ev);
+
+  UpdateTimer = SingletonEvents::RegisterTimer(PhysicsDeltaTime, std::bind(&MovementManager::UpdateDynamicPositions, this, _1, _2));
 
   return 0;
 }
 
-void MovementManager::CreateWorld()
+void MovementManager::CreateWorld(double gx, double gy)
 {
-  world = new b2World(b2Vec2(0.0, 10.0));
-  b2BodyDef groundBodyDef;
-	groundBodyDef.position.Set(CenterX, CenterY + 0.5f);
-
-  // Call the body factory which allocates memory for the ground body
-	// from a pool and creates the ground box shape (also from a pool).
-	// The body is also added to the world.
-	b2Body* groundBody = world->CreateBody(&groundBodyDef);
-
-  // Define the ground box shape.
-	b2PolygonShape groundBox;
-
-  // The extents are the half-widths of the box.
-	groundBox.SetAsBox(50.0f, 0.5f);
-
-  // Add the ground fixture to the ground body.
-	groundBody->CreateFixture(&groundBox, 0.0f);
-
-  // Define the dynamic body. We set its position and call the body factory.
-	b2BodyDef bodyDef;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(CenterX, CenterY - 4.0);
-	CenterBody = world->CreateBody(&bodyDef);
-
-  // Define another box shape for our dynamic body.
-	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(0.5f, 0.5f);
-
-  // Define the dynamic body fixture.
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &dynamicBox;
-
-  // Set the box density to be non-zero, so it will be dynamic.
-	fixtureDef.density = 1.0f;
-
-	// Override the default friction.
-	fixtureDef.friction = 0.3f;
-
-	// Add the shape to the body.
-	CenterBody->CreateFixture(&fixtureDef);
+  if (world != NULL) {
+    CenterBody = NULL;
+    ControlBody = NULL;
+    delete world;
+  }
+  world = new b2World(b2Vec2(gx, gy));
 }
 
-void MovementManager::UpdateDynamicPositions(double dt)
+b2Body * MovementManager::AddStaticBody(int32_t x, int32_t y, int32_t sx, int32_t sy)
 {
-  dt = 1/60.0;
-  if (CenterBody->GetLinearVelocity().x >= speedLimitX) {
-    CenterBody->SetLinearVelocity(b2Vec2(speedLimitX,CenterBody->GetLinearVelocity().y));
-  } else if (CenterBody->GetLinearVelocity().x < -speedLimitX) {
-    CenterBody->SetLinearVelocity(b2Vec2(-speedLimitX,CenterBody->GetLinearVelocity().y));
+  if (world == NULL) return NULL;
+  b2BodyDef def;
+	def.position.Set(x * PixelToMeters, y * PixelToMeters);
+
+	b2Body * body = world->CreateBody(&def);
+
+	b2PolygonShape box;
+	box.SetAsBox(sx * PixelToMeters / 2.0, sy * PixelToMeters / 2.0);
+	body->CreateFixture(&box, 0.0f);
+  return body;
+}
+
+b2Body * MovementManager::AddDynamicBody(int32_t x, int32_t y, int32_t sx, int32_t sy, float d, float f)
+{
+  if (world == NULL) return NULL;
+  b2BodyDef bodyDef;
+  bodyDef.type = b2_dynamicBody;
+  bodyDef.position.Set(x * PixelToMeters, y * PixelToMeters);
+  bodyDef.fixedRotation = true;
+  b2Body * body = world->CreateBody(&bodyDef);
+
+  b2PolygonShape dynamicBox;
+  dynamicBox.SetAsBox(sx * PixelToMeters / 2.0, sy * PixelToMeters / 2.0);
+
+  b2FixtureDef fixtureDef;
+  fixtureDef.shape = &dynamicBox;
+  fixtureDef.density = d;
+  fixtureDef.friction = f;
+  body->CreateFixture(&fixtureDef);
+  return body;
+}
+
+void MovementManager::UpdateDynamicPositions(double dt, double elapsed)
+{
+  if (world == NULL) return;
+  if (ControlBody != NULL) {
+    if (ControlBody->GetLinearVelocity().x >= speedLimitX) {
+      ControlBody->SetLinearVelocity(b2Vec2(speedLimitX,ControlBody->GetLinearVelocity().y));
+    } else if (ControlBody->GetLinearVelocity().x < -speedLimitX) {
+      ControlBody->SetLinearVelocity(b2Vec2(-speedLimitX,ControlBody->GetLinearVelocity().y));
+    }
   }
+
   world->Step(dt, vIter, pIter);
-  CenterX = CenterBody->GetPosition().x + 0.5;
-  CenterY = CenterBody->GetPosition().y + 0.5;
   world->ClearForces();
+}
+
+void MovementManager::SetToCenterInPixels(int32_t &x, int32_t &y)
+{
+  if (CenterBody == NULL) return;
+  b2Vec2 center = CenterBody->GetWorldCenter();
+  x = center.x / PixelToMeters;
+  y = center.y / PixelToMeters;
 }

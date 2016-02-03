@@ -2,16 +2,13 @@
   "Name" : "Floor01",
   "File" : "assets/tiles/floor01.png",
   "Size" : [0, 0, 64, 64],
+  "Collision" : [64, 64],
   "Surface" : false,
   "Texture" : true,
   "LoadOnStartup" : false,
   "Unload" : true,
   "Properties" : {
     "AllowInside" : false,
-    "AllowFall" : false,
-    "AllowFromLeft" : false,
-    "AllowFromRight" : false,
-    "AllowFromAbove" : false,
-    "AfllowFromBelow" : false
+    "AllowFall" : false
   }
 }
